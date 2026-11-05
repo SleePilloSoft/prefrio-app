@@ -1,0 +1,34 @@
+services:
+  prefrio-app:
+    build: .
+    container_name: prefrio-app
+    env_file: .env
+    depends_on:
+      prefrio-db:
+        condition: service_healthy
+    networks:
+      - default
+      - prefrio_red
+    restart: unless-stopped
+
+  prefrio-db:
+    image: postgres:16
+    container_name: prefrio-db
+    environment:
+      POSTGRES_DB: prefrio
+      POSTGRES_USER: prefrio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - prefrio_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prefrio -d prefrio"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  prefrio_db_data:
+
+networks:
+  prefrio_red:
+    external: true
