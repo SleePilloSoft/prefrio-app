@@ -10,6 +10,18 @@ def ahora_utc() -> datetime:
     return datetime.now(timezone.utc)
 
 
+class Dispositivo(Base):
+    """Tablero (Raspberry) autorizado a enviar lecturas. Guarda solo el hash del token."""
+
+    __tablename__ = "dispositivos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(64), unique=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    creado_utc: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=ahora_utc)
+    revocado_utc: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class Ciclo(Base):
     """Carga y pre-frío de un túnel. Se completa en la fase de ciclo."""
 
